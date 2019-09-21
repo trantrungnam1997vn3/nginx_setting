@@ -1,0 +1,72 @@
+﻿Tìm hiểu NGINX
+
+Dowload NGINX tại: http://nginx.org/en/download.html
+Here is an example for the drive C: root directory
+cd c:\
+unzip nginx-1.17.3.zip
+cd nginx-1.17.3
+start nginx
+
+Chạy NGINX:
+
+C:\nginx-1.17.3>tasklist /fi "imagename eq nginx.exe"
+
+
+ 
+
+Paths in a configuration file must be specified in UNIX-style using forward slashes:
+access_log   		logs/site.log;
+root         		C:/web/html;
+
+
+nginx/Windows runs as a standard console application (not a service), and it can be managed using the following commands:
+nginx -s stop	fast shutdown
+nginx -s quit	graceful shutdown
+nginx -s reload	changing configuration, starting new worker processes with a new configuration, graceful shutdown of old worker processes
+nginx -s reopen	re-opening log files
+
+Known issues
+•	Although several workers can be started, only one of them actually does any work.
+•	The UDP proxy functionality is not supported.
+Possible future enhancements
+•	Running as a service.
+•	Using the I/O completion ports as a connection processing method.
+•	Using multiple worker threads inside a single worker process.
+
+openssl genrsa -des3 -out rootSSL.key 2048
+openssl req -x509 -new -nodes -key rootSSL.key -sha256 -days 1024 -out rootSSL.pem
+///
+Two letter Country code: I use “AU” for Australia.
+Your state or province: I use “NSW” for New South Wales.
+Your city: I use “Sydney”.
+An organisation name: I use “Zero Point Development”.
+An organisational unit name: I use “Development”.
+A common name such as the server name or the fully qualified .domain name (FQDN): I use “zeropointdevelopment.com”.
+An admin email address: I use “hello@zeropointdevelopment.com”.
+////
+Place all certificates in the following store
+///
+
+c:\program files\windows\system32\drivers\etc\hosts file.
+
+127.0.0.1 client-1.local
+
+openssl req -new -sha256 -nodes -out client-1.local.csr -newkey rsa:2048 -keyout client-1.local.key -subj "/C=AU/ST=NSW/L=Sydney/O=Client One/OU=Dev/CN=client-1/emailAddress=hello@client-1.local"
+
+openssl x509 -req -in client-1.local.csr -CA rootSSL.pem -CAkey rootSSL.key -CAcreateserial -out client-1.local.crt -days 500 -sha256 -extensions "authorityKeyIdentifier=keyid,issuer\n basicConstraints=CA:FALSE\n keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment\n  subjectAltName=DNS:client-1.local"
+
+server {
+    listen       80;
+    server_name  client-1.local;
+
+    # New Lines below
+    listen 443 ssl;	
+    ssl on;
+    ssl_certificate f:/LDE/nginx/SSL/client-1.local.crt;
+    ssl_certificate_key f:/LDE/nginx/SSL/client-1.local.key;
+
+
+netstat -o -n -a | findstr 0.0:80
+ taskkill /PID 4 /F
+taskkill /f /IM nginx.exe
+tasklist /fi "imagename eq nginx.exe"
